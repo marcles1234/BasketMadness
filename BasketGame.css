@@ -1,0 +1,12 @@
+body, html, canvas {
+    overflow: hidden;
+}
+
+body, html{
+    height: 100%;
+    overflow: hidden;
+}
+
+.nav-link {
+    color: white !important; /* Forces nav-link to be white */
+}

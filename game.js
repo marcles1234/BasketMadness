@@ -12,7 +12,41 @@ const bootBackground = {
     }
 };
 
+// ************************* Scene to add timer  *************************
+const bootTimer = {
+    key: 'timer',
+    active: true,
 
+    create: function () {
+        var graphics = this.add.graphics();
+        var rect = new Phaser.Geom.Rectangle(868, 50, 400, 68);
+        graphics.fillStyle(0x929596, 1);
+        graphics.lineStyle(2, 0x656666, 1)
+        graphics.fillRectShape(rect);
+        graphics.strokeRectShape(rect);
+        var text = this.add.text(888, 70, 'Time remaining: 20', {fontSize: '28px', fill: '#ffffff',});
+        text.setOrigin(0, 0);
+        var timeTrack = 20;
+
+        this.timer = this.time.addEvent({
+            delay: 1000,
+            callback: function() {
+                timeTrack -= 1;
+                text.setText('Time remaining: ' + timeTrack)
+                if (timeTrack <= 0) {
+                    this.scene.stop("question")
+                    this.scene.stop("catch")
+                    this.scene.stop("throw")
+                    this.scene.start("end")
+                }
+            },
+            callbackScope: this,
+            loop: true
+        });
+        this.graphics = graphics;
+    },
+};
+        
 // ************************* Inital question scene  *************************
 const bootQuestion = {
     key: 'question',
@@ -38,7 +72,7 @@ const bootQuestion = {
         this.graphics = graphics;
     },
 
-    update: function(){
+    update: function() {
         function questionClear(pointer, gameObject){
             console.log('Rectangle clicked!');
             this.scene.start("catch")
@@ -71,7 +105,7 @@ const bootCatch = {
         this.ball = this.add.image(640, 200, 'ball').setScale(0.5);
     },
 
-    update: function(){
+    update: function() {
         function questionClear(pointer, gameObject){
             if (this.ball.y > 430 && this.ball.y < 465){
                 console.log('Rectangle clicked!');
@@ -98,7 +132,7 @@ const bootThrow = {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/basketball.png');
     },
 
-    create: function(){
+    create: function() {
         var rectGraphics = this.add.graphics();
         var button = new Phaser.Geom.Rectangle(880, 295, 255, 68);
         var bar = new Phaser.Geom.Rectangle(780, 100, 25, 400);
@@ -162,7 +196,7 @@ const bootEnd = {
         graphics.lineStyle(2, 0x656666, 1)
         graphics.fillRectShape(button);
         graphics.strokeRectShape(button);
-        graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);#
+        graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
         var text = this.add.text(520, 170, 'End! Click to re-do.', {fontSize: '31px', fill: '#ffffff',});
         text.setOrigin(0, 0);
@@ -170,10 +204,11 @@ const bootEnd = {
         this.graphics = graphics;
     },
     
-    update: function(){
+    update: function() {
         function questionClear(pointer, gameObject){
             console.log('Rectangle clicked!');
             this.scene.start("question")
+            this.scene.start("timer")
         }
         this.graphics.on('pointerdown', questionClear, this);
     }
@@ -184,5 +219,5 @@ new Phaser.Game({
     type: Phaser.AUTO,
     width: 1280,
     height: 610,
-    scene: [bootBackground, bootQuestion, bootCatch, bootThrow, bootEnd],
+    scene: [bootBackground, bootQuestion, bootCatch, bootThrow, bootEnd, bootTimer],
 });

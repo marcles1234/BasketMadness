@@ -9,6 +9,8 @@ const bootBackground = {
 
     create: function() {
         this.add.image(0, 0, 'court').setOrigin(0, 0);
+        this.registry.set('score', 0);
+        console.log('score: ' + this.registry.get('score'))
     }
 };
 
@@ -19,13 +21,18 @@ const bootTimer = {
 
     create: function () {
         var graphics = this.add.graphics();
-        var rect = new Phaser.Geom.Rectangle(868, 50, 400, 68);
+        var rect = new Phaser.Geom.Rectangle(868, 50, 400, 116);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
         graphics.fillRectShape(rect);
         graphics.strokeRectShape(rect);
+
+
         var text = this.add.text(888, 70, 'Time remaining: 20', {fontSize: '28px', fill: '#ffffff',});
+        this.scoreText = this.add.text(888, 118, 'Score: ', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
+        this.scoreText.setOrigin(0, 0);
+
         var timeTrack = 20;
 
         this.timer = this.time.addEvent({
@@ -37,7 +44,7 @@ const bootTimer = {
                     this.scene.stop("question")
                     this.scene.stop("catch")
                     this.scene.stop("throw")
-                    this.scene.start("end")
+                    this.scene.start("fail")
                 }
             },
             callbackScope: this,
@@ -45,6 +52,10 @@ const bootTimer = {
         });
         this.graphics = graphics;
     },
+    
+    update: function() {
+        this.scoreText.setText('Score: ' + this.registry.get('score'))
+    }
 };
         
 // ************************* Inital question scene  *************************
@@ -70,12 +81,17 @@ const bootQuestion = {
         text.setOrigin(0, 0);
 
         this.graphics = graphics;
+        this.buttonNotClicked = true;
     },
 
     update: function() {
         function questionClear(pointer, gameObject){
-            console.log('Rectangle clicked!');
-            this.scene.start("catch")
+            if (this.buttonNotClicked) {
+                this.buttonNotClicked = false;
+                console.log('Rectangle clicked!');
+                this.registry.inc('score', 10);
+                this.scene.start("catch")
+            }
         }
         this.graphics.on('pointerdown', questionClear, this);
     }
@@ -103,13 +119,18 @@ const bootCatch = {
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
         this.graphics = graphics;
         this.ball = this.add.image(640, 200, 'ball').setScale(0.5);
+        this.buttonNotClicked = true;
     },
 
     update: function() {
         function questionClear(pointer, gameObject){
             if (this.ball.y > 430 && this.ball.y < 465){
-                console.log('Rectangle clicked!');
-                this.scene.start("throw")
+                if (this.buttonNotClicked) {
+                    this.buttonNotClicked = false;
+                    console.log('Rectangle clicked!');
+                    this.registry.inc('score', 10);
+                    this.scene.start("throw")
+                }
             } else {
                 this.scene.start("question")
             }
@@ -171,13 +192,18 @@ const bootThrow = {
         this.polyGraphics = polyGraphics;
 
         this.ball = this.add.image(640, 450, 'ball').setScale(0.5);
+        this.buttonNotClicked = true;
     },
 
     update: function(){
         function questionClear(pointer, gameObject){
             if (this.polyGraphics.y > 100){ //Need a power level less than 25 to succeed
-                console.log('Rectangle clicked!');
-                this.scene.start("end")
+                if (this.buttonNotClicked) {
+                    this.buttonNotClicked = false;
+                    console.log('Rectangle clicked!');
+                    this.registry.inc('score', 10);
+                    this.scene.start("end")
+                }
             }
         }
         this.rectGraphics.on('pointerdown', questionClear, this);
@@ -185,7 +211,7 @@ const bootThrow = {
 };
 
 
-// ************************* Ending scene  *************************
+// ************************* End scene  *************************
 const bootEnd = {
     key: 'end',
 
@@ -214,10 +240,42 @@ const bootEnd = {
     }
 };
 
+
+// ************************* Fail scene  *************************
+const bootFail = {
+    key: 'fail',
+
+    create: function() {
+        var graphics = this.add.graphics();
+        var button = new Phaser.Geom.Rectangle(500, 150, 400, 200);
+        graphics.fillStyle(0x929596, 1);
+        graphics.lineStyle(2, 0x656666, 1)
+        graphics.fillRectShape(button);
+        graphics.strokeRectShape(button);
+        graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
+
+        var text = this.add.text(520, 170, 'Fail! Click to re-do.', {fontSize: '31px', fill: '#ffffff',});
+        text.setOrigin(0, 0);
+
+        this.graphics = graphics;
+        this.registry.set('score', 0);
+    },
+    
+    update: function() {
+        function questionClear(pointer, gameObject){
+            console.log('Rectangle clicked!');
+            this.scene.start("question")
+            this.scene.start("timer")
+        }
+        this.graphics.on('pointerdown', questionClear, this);
+    }
+};
+
+
 // Initalise the game and scenes
 new Phaser.Game({
     type: Phaser.AUTO,
     width: 1280,
     height: 610,
-    scene: [bootBackground, bootQuestion, bootCatch, bootThrow, bootEnd, bootTimer],
+    scene: [bootBackground, bootQuestion, bootCatch, bootThrow, bootEnd, bootFail, bootTimer],
 });

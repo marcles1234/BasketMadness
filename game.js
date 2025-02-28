@@ -10,7 +10,6 @@ const bootBackground = {
     create: function() {
         this.add.image(0, 0, 'court').setOrigin(0, 0);
         this.registry.set('score', 0);
-        console.log('score: ' + this.registry.get('score'))
     }
 };
 
@@ -41,9 +40,6 @@ const bootTimer = {
                 timeTrack -= 1;
                 text.setText('Time remaining: ' + timeTrack)
                 if (timeTrack <= 0) {
-                    this.scene.stop("question")
-                    this.scene.stop("catch")
-                    this.scene.stop("throw")
                     this.scene.start("fail")
                 }
             },
@@ -80,6 +76,23 @@ const bootQuestion = {
         var text = this.add.text(800, 315, 'Submit Answer', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
+        var text = this.add.text(120, 300, 'What is 5 + 5?', { font: '32px Courier', fill: '#ffffff',});
+        this.answer = 5+5;
+
+        this.add.text(120, 350, 'Enter answer:', { font: '32px Courier', fill: '#ffffff' });
+        this.textAnswer = this.add.text(120, 400, '', { font: '32px Courier', fill: '#ffff00' });
+        this.input.keyboard.on('keydown', event =>
+        {
+            if (event.keyCode === 8 && this.textAnswer.text.length > 0)
+            {
+                this.textAnswer.text = this.textAnswer.text.substr(0, this.textAnswer.text.length - 1);
+            }
+            else if (event.keyCode === 32 || (event.keyCode >= 48 && event.keyCode <= 90))
+            {
+                this.textAnswer.text += event.key;
+            }
+        });
+
         this.graphics = graphics;
         this.buttonNotClicked = true;
     },
@@ -87,10 +100,11 @@ const bootQuestion = {
     update: function() {
         function questionClear(pointer, gameObject){
             if (this.buttonNotClicked) {
-                this.buttonNotClicked = false;
-                console.log('Rectangle clicked!');
-                this.registry.inc('score', 10);
-                this.scene.start("catch")
+                if (this.textAnswer.text == this.answer) {
+                    this.buttonNotClicked = false;
+                    this.registry.inc('score', 10);
+                    this.scene.start("catch")
+                }
             }
         }
         this.graphics.on('pointerdown', questionClear, this);
@@ -127,7 +141,6 @@ const bootCatch = {
             if (this.ball.y > 430 && this.ball.y < 465){
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
-                    console.log('Rectangle clicked!');
                     this.registry.inc('score', 10);
                     this.scene.start("throw")
                 }
@@ -196,11 +209,38 @@ const bootThrow = {
     },
 
     update: function(){
-        function questionClear(pointer, gameObject){
+        function sleep(time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+
+        async function questionClear(pointer, gameObject){
             if (this.polyGraphics.y > 100){ //Need a power level less than 25 to succeed
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
-                    console.log('Rectangle clicked!');
+                    this.scene.pause("timer");
+                    for (i = 0; i < 32; i++) {
+                        var scale = 0.5 - (i / 100);
+                        this.ball.setScale(scale);
+                        this.ball.y -= 12;
+                        if (i <= 16) {
+                            await sleep(25);
+                        } else if (i >=17 && i <= 26) {
+                            await sleep(45);
+                        } else {
+                            await sleep(55)
+                        }
+                    }
+                    for (i = 0; i < 32; i++) {
+                        if (i <= 6) {
+                            this.ball.y += 12;
+                            var scale = 0.18 - (i / 200);
+                            this.ball.setScale(scale);
+                            await sleep(55);
+                        } else if (i >=5 && i <= 12) {
+                            this.ball.y += 3;
+                            await sleep(150);
+                        }
+                    }
                     this.registry.inc('score', 10);
                     this.scene.start("end")
                 }
@@ -214,6 +254,10 @@ const bootThrow = {
 // ************************* End scene  *************************
 const bootEnd = {
     key: 'end',
+
+    preload: function () {
+        this.scene.pause("timer")
+    },
 
     create: function() {
         var graphics = this.add.graphics();
@@ -232,7 +276,6 @@ const bootEnd = {
     
     update: function() {
         function questionClear(pointer, gameObject){
-            console.log('Rectangle clicked!');
             this.scene.start("question")
             this.scene.start("timer")
         }
@@ -244,6 +287,12 @@ const bootEnd = {
 // ************************* Fail scene  *************************
 const bootFail = {
     key: 'fail',
+
+    preload: function() {
+        this.scene.stop("question")
+        this.scene.stop("catch")
+        this.scene.stop("throw")
+    },
 
     create: function() {
         var graphics = this.add.graphics();
@@ -263,7 +312,6 @@ const bootFail = {
     
     update: function() {
         function questionClear(pointer, gameObject){
-            console.log('Rectangle clicked!');
             this.scene.start("question")
             this.scene.start("timer")
         }

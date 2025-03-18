@@ -1,7 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
-    <div id = "questions">
-        <h1>Enter the questions for the game here</h1>
+    <div id="questions">
+        <label for="question1">Question 1:</label>
+        <textarea id="question1" required></textarea>
+        <label for="answer1">Answer 1:</label>
+        <input type="text" id="answer1" required>
+
+        <label for="question2">Question 2:</label>
+        <textarea id="question2" required></textarea>
+        <label for="answer2">Answer 2:</label>
+        <input type="text" id="answer2" required>
+
+        <button id="save-json">Save JSON</button>
+
+        <input type="file" id="file-input" accept=".json" />
+        
     </div>
+
+    <script src="questions.js"></script>
 </body>
+</html>

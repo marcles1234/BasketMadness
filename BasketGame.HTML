@@ -37,6 +37,11 @@ function loadPage(page) {
                 script.src = 'game.js';
                 script.type = 'text/javascript';
                 document.body.appendChild(script);
+            } else if (page === 'questions.html') {
+                const script = document.createElement('script');
+                script.src = 'questions.js';
+                script.type = 'text/javascript';
+                document.body.appendChild(script);
             }
         })
     .catch(error => {

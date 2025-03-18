@@ -117,7 +117,7 @@ const bootCatch = {
     key: 'catch',
 
     preload: function() {
-        this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/basketball.png');
+        this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
     },
 
     create: function() {
@@ -132,7 +132,7 @@ const bootCatch = {
 
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
         this.graphics = graphics;
-        this.ball = this.add.image(640, 200, 'ball').setScale(0.5);
+        this.ball = this.add.image(640, 200, 'ball');
         this.buttonNotClicked = true;
     },
 
@@ -163,7 +163,7 @@ const bootThrow = {
     key: 'throw',
 
     preload: function() {
-        this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/basketball.png');
+        this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
     },
 
     create: function() {
@@ -204,7 +204,7 @@ const bootThrow = {
         this.rectGraphics = rectGraphics;
         this.polyGraphics = polyGraphics;
 
-        this.ball = this.add.image(640, 450, 'ball').setScale(0.5);
+        this.ball = this.add.image(640, 450, 'ball');
         this.buttonNotClicked = true;
     },
 
@@ -219,7 +219,7 @@ const bootThrow = {
                     this.buttonNotClicked = false;
                     this.scene.pause("timer");
                     for (i = 0; i < 32; i++) {
-                        var scale = 0.5 - (i / 100);
+                        var scale = 1 - (i / 50);
                         this.ball.setScale(scale);
                         this.ball.y -= 12;
                         if (i <= 16) {
@@ -233,7 +233,7 @@ const bootThrow = {
                     for (i = 0; i < 32; i++) {
                         if (i <= 6) {
                             this.ball.y += 12;
-                            var scale = 0.18 - (i / 200);
+                            var scale = 0.36 - (i / 200);
                             this.ball.setScale(scale);
                             await sleep(55);
                         } else if (i >=5 && i <= 12) {

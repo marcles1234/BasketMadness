@@ -53,11 +53,26 @@ const bootTimer = {
         this.scoreText.setText('Score: ' + this.registry.get('score'))
     }
 };
-        
+
 // ************************* Inital question scene  *************************
 const bootQuestion = {
     key: 'question',
     active: true,
+
+    preload: function() {
+        const savedQandAs = JSON.parse(localStorage.getItem('QandAs')) || []; //access localstorage for question data
+        this.savedQandAs = savedQandAs;
+        var questionNum;
+        do {
+            questionNum = Math.floor(Math.random() * 4);
+        } while (questionNum % 2 == 1)
+        this.questionNum = questionNum;
+        this.answerNum = questionNum + 1;
+        console.log(this.questionNum);
+        console.log(this.answerNum);
+        console.log(savedQandAs[this.questionNum]);
+        console.log(savedQandAs[this.answerNum]);
+    },
 
     create: function() {
         var graphics = this.add.graphics();
@@ -76,8 +91,8 @@ const bootQuestion = {
         var text = this.add.text(800, 315, 'Submit Answer', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
-        var text = this.add.text(120, 300, 'What is 5 + 5?', { font: '32px Courier', fill: '#ffffff',});
-        this.answer = 5+5;
+        var text = this.add.text(120, 300, 'What is ' + this.savedQandAs[this.questionNum] + '?', { font: '32px Courier', fill: '#ffffff',});
+        this.answer = this.savedQandAs[this.answerNum];
 
         this.add.text(120, 350, 'Enter answer:', { font: '32px Courier', fill: '#ffffff' });
         this.textAnswer = this.add.text(120, 400, '', { font: '32px Courier', fill: '#ffff00' });
@@ -164,6 +179,7 @@ const bootThrow = {
 
     preload: function() {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
+        this.load.image('net', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/net.png');
     },
 
     create: function() {
@@ -230,6 +246,7 @@ const bootThrow = {
                             await sleep(55)
                         }
                     }
+                    this.net = this.add.image(642, 159.5, 'net');
                     for (i = 0; i < 32; i++) {
                         if (i <= 6) {
                             this.ball.y += 12;

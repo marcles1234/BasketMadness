@@ -20,25 +20,25 @@ const bootTimer = {
 
     create: function () {
         var graphics = this.add.graphics();
-        var rect = new Phaser.Geom.Rectangle(868, 50, 400, 116);
+        var rect = new Phaser.Geom.Rectangle(1068, 12, 200, 116);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
         graphics.fillRectShape(rect);
         graphics.strokeRectShape(rect);
 
 
-        var text = this.add.text(888, 70, 'Time remaining: 20', {fontSize: '28px', fill: '#ffffff',});
-        this.scoreText = this.add.text(888, 118, 'Score: ', {fontSize: '28px', fill: '#ffffff',});
+        var text = this.add.text(1088, 32, 'Time: 60', {fontSize: '28px', fill: '#ffffff',});
+        this.scoreText = this.add.text(1088, 80, 'Score: ', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
         this.scoreText.setOrigin(0, 0);
 
-        var timeTrack = 20;
+        var timeTrack = 60;
 
         this.timer = this.time.addEvent({
             delay: 1000,
             callback: function() {
                 timeTrack -= 1;
-                text.setText('Time remaining: ' + timeTrack)
+                text.setText('Time: ' + timeTrack)
                 if (timeTrack <= 0) {
                     this.scene.start("fail")
                 }
@@ -61,17 +61,23 @@ const bootQuestion = {
 
     preload: function() {
         const savedQandAs = JSON.parse(localStorage.getItem('QandAs')) || []; //access localstorage for question data
-        this.savedQandAs = savedQandAs;
         var questionNum;
+        if (savedQandAs[0] === undefined) { // fill array if empty
+            for (var i = 0; i < 20; i++) {
+                if (i % 2 == 0) {
+                    savedQandAs[i] = i  + '+' + (i+1)
+                } else if (i % 2 == 1) {
+                    var tempAnswer = i + (i+1) - 2;
+                    savedQandAs[i] = tempAnswer
+                }
+            }
+        }
         do {
-            questionNum = Math.floor(Math.random() * 4);
-        } while (questionNum % 2 == 1)
+            questionNum = Math.floor(Math.random() * 20);
+        } while (questionNum % 2 == 1 || this.registry.get(questionNum.toString()) == 1)
         this.questionNum = questionNum;
         this.answerNum = questionNum + 1;
-        console.log(this.questionNum);
-        console.log(this.answerNum);
-        console.log(savedQandAs[this.questionNum]);
-        console.log(savedQandAs[this.answerNum]);
+        this.savedQandAs = savedQandAs;
     },
 
     create: function() {
@@ -117,6 +123,13 @@ const bootQuestion = {
             if (this.buttonNotClicked) {
                 if (this.textAnswer.text == this.answer) {
                     this.buttonNotClicked = false;
+                    this.registry.set(this.questionNum.toString(), 1);
+                    this.registry.inc('completions', 1)
+                    if (this.registry.get('completions') == 10) {
+                        for (var i = 0; i < 20; i++) {
+                            this.registry.set(i.toString(), 0)
+                        }
+                    }
                     this.registry.inc('score', 10);
                     this.scene.start("catch")
                 }
@@ -137,8 +150,6 @@ const bootCatch = {
 
     create: function() {
         var graphics = this.add.graphics();
-        var text = this.add.text(120, 120, 'Catch!', {fontSize: '31px', fill: '#ffffff',});
-        text.setOrigin(0, 0);
         var button = new Phaser.Geom.Rectangle(540, 350, 200, 200);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
@@ -180,6 +191,15 @@ const bootThrow = {
     preload: function() {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
         this.load.image('net', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/net.png');
+        var distance = Math.floor(Math.random() * 70) + 1;
+        var height = Math.floor(Math.random() * 70) + 1;
+        var power = Math.sqrt((distance * distance) + (height * height))
+        this.distance = distance;
+        this.height = height;
+        this.powerLower = power - 0.5;
+        this.powerUpper = power + 0.5
+        console.log(this.powerLower);
+        console.log(this.powerUpper);
     },
 
     create: function() {
@@ -198,6 +218,9 @@ const bootThrow = {
         text.setOrigin(0, 0);
         var powerValue = 50;
 
+        var distanceText = this.add.text(900, 211, 'Distance: ' + this.distance, {fontSize: '28px', fill: '#000000',});
+        var heightText = this.add.text(900, 253, 'Height: ' + this.height, {fontSize: '28px', fill: '#000000',});
+
         var polyGraphics = this.add.graphics();
         var arrow = new Phaser.Geom.Polygon([{x:800, y:300}, {x:810, y:310}, {x:850, y:310}, {x:850, y:290}, {x:810, y:290}]);
         polyGraphics.fillStyle(0x929596, 1);
@@ -212,7 +235,9 @@ const bootThrow = {
             "drag",
             function (pointer, dragX, dragY) {
                 polyGraphics.y = Phaser.Math.Clamp(dragY, minY, maxY);
-                text.setText('Power: ' + Math.floor(powerValue - (polyGraphics.y/4)));
+                var powerLevel = Math.floor(powerValue - (polyGraphics.y/4));
+                this.powerLevel = powerLevel
+                text.setText('Power: ' + powerLevel);
             },
             this
         );
@@ -230,7 +255,8 @@ const bootThrow = {
         }
 
         async function questionClear(pointer, gameObject){
-            if (this.polyGraphics.y > 100){ //Need a power level less than 25 to succeed
+            //if (this.powerLevel < this.powerUpper && this.powerLevel > this.powerLower){
+            if (this.powerLevel < 50){
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
                     this.scene.pause("timer");
@@ -285,7 +311,9 @@ const bootEnd = {
         graphics.strokeRectShape(button);
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
-        var text = this.add.text(520, 170, 'End! Click to re-do.', {fontSize: '31px', fill: '#ffffff',});
+        var text = this.add.text(520, 170, 'Congratulations! \nYou have won!', {fontSize: '31px', fill: '#ffffff',});
+        text.setOrigin(0, 0);
+        var text = this.add.text(520, 246, 'Click this box to re-set', {fontSize: '24px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
         this.graphics = graphics;
@@ -320,7 +348,9 @@ const bootFail = {
         graphics.strokeRectShape(button);
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
-        var text = this.add.text(520, 170, 'Fail! Click to re-do.', {fontSize: '31px', fill: '#ffffff',});
+        var text = this.add.text(520, 170, 'Times up! \nBetter luck next time!', {fontSize: '31px', fill: '#ffffff',});
+        text.setOrigin(0, 0);
+        var text = this.add.text(520, 246, 'Click this box re-try.', {fontSize: '24px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
         this.graphics = graphics;

@@ -1,11 +1,20 @@
 const button = document.getElementById("save-json");
 
-const varnames = ["question1", "answer1", "question2", "answer2"];
+const varnames = ["question1", "answer1", 
+    "question2", "answer2", 
+    "question3", "answer3", 
+    "question4", "answer4", 
+    "question5", "answer5", 
+    "question6", "answer6", 
+    "question7", "answer7", 
+    "question8", "answer8", 
+    "question9", "answer9", 
+    "question10", "answer10"];
 
 button.addEventListener("click", function() {
     const jsonData = {};
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 20; i++) {
         const textarea = document.getElementById(varnames[i]);
         const textareaValue = textarea.value;
         jsonData[varnames[i]] = textareaValue;
@@ -23,7 +32,7 @@ button.addEventListener("click", function() {
 });
 
 
-const QandAs = new Array(4);
+const QandAs = new Array(20);
 
 const fileInput = document.getElementById("file-input");
 
@@ -58,7 +67,7 @@ fileInput.addEventListener("change", function(event) {
 
 const button1 = document.getElementById("test-elements");
 button1.addEventListener("click", function() {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 20; i++) {
         console.log("QandAs element ", i, " = ", QandAs[i]);
     }
 });

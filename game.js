@@ -146,15 +146,22 @@ const bootCatch = {
 
     preload: function() {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
+        this.load.image('zone', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Zone.png');
+        this.load.image('handRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('handLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
     },
 
     create: function() {
         var graphics = this.add.graphics();
         var button = new Phaser.Geom.Rectangle(540, 350, 200, 200);
-        graphics.fillStyle(0x929596, 1);
-        graphics.lineStyle(2, 0x656666, 1)
+        graphics.fillStyle(0x929596, 0);
+        graphics.lineStyle(2, 0x656666, 0)
         graphics.fillRectShape(button);
         graphics.strokeRectShape(button);
+        this.zone = this.add.image(640, 450, 'zone');
+        this.handRight = this.add.image(790, 470, 'handRight');
+        this.handLeft = this.add.image(490, 470, 'handLeft');
+        this.handLeft.setFlipX(true);
 
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
         this.graphics = graphics;
@@ -191,6 +198,11 @@ const bootThrow = {
     preload: function() {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
         this.load.image('net', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/net.png');
+        this.load.image('bar', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/PowerMeter.png');
+        this.load.image('handRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('handLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('cutHandRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
+        this.load.image('cutHandLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
         var distance = Math.floor(Math.random() * 70) + 1;
         var height = Math.floor(Math.random() * 70) + 1;
         var power = Math.sqrt((distance * distance) + (height * height))
@@ -198,20 +210,16 @@ const bootThrow = {
         this.height = height;
         this.powerLower = power - 0.5;
         this.powerUpper = power + 0.5
-        console.log(this.powerLower);
-        console.log(this.powerUpper);
     },
 
     create: function() {
         var rectGraphics = this.add.graphics();
         var button = new Phaser.Geom.Rectangle(880, 295, 255, 68);
-        var bar = new Phaser.Geom.Rectangle(780, 100, 25, 400);
         rectGraphics.fillStyle(0x929596, 1);
         rectGraphics.lineStyle(2, 0x656666, 1)
         rectGraphics.fillRectShape(button);
         rectGraphics.strokeRectShape(button);
-        rectGraphics.fillRectShape(bar);
-        rectGraphics.strokeRectShape(bar);
+        this.powerBar = this.add.image(795, 300, 'bar');
         rectGraphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
         var text = this.add.text(900, 315, 'Power: 50', {fontSize: '28px', fill: '#ffffff',});
@@ -245,7 +253,13 @@ const bootThrow = {
         this.rectGraphics = rectGraphics;
         this.polyGraphics = polyGraphics;
 
+        this.handRight = this.add.image(720, 470, 'handRight');
+        this.handLeft = this.add.image(560, 470, 'handLeft');
+        this.handLeft.setFlipX(true);
         this.ball = this.add.image(640, 450, 'ball');
+        this.cutHandRight = this.add.image(724, 470, 'cutHandRight');
+        this.cutHandLeft = this.add.image(560, 470, 'cutHandLeft');
+        this.cutHandLeft.setFlipX(true);
         this.buttonNotClicked = true;
     },
 

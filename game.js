@@ -147,8 +147,9 @@ const bootCatch = {
     preload: function() {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
         this.load.image('zone', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Zone.png');
-        this.load.image('handRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
-        this.load.image('handLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('hand', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('cutHand', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
+        this.notCaught = true;
     },
 
     create: function() {
@@ -159,8 +160,8 @@ const bootCatch = {
         graphics.fillRectShape(button);
         graphics.strokeRectShape(button);
         this.zone = this.add.image(640, 450, 'zone');
-        this.handRight = this.add.image(790, 470, 'handRight');
-        this.handLeft = this.add.image(490, 470, 'handLeft');
+        this.handRight = this.add.image(790, 470, 'hand');
+        this.handLeft = this.add.image(490, 470, 'hand');
         this.handLeft.setFlipX(true);
 
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
@@ -170,11 +171,28 @@ const bootCatch = {
     },
 
     update: function() {
-        function questionClear(pointer, gameObject){
+        function sleep(time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+
+        async function questionClear(pointer, gameObject){
             if (this.ball.y > 430 && this.ball.y < 465){
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
                     this.registry.inc('score', 10);
+                    this.notCaught = false;
+                    this.cutHandRight = this.add.image(790, 470, 'cutHand');
+                    this.cutHandLeft = this.add.image(490, 470, 'cutHand');
+                    this.cutHandLeft.setFlipX(true);
+                    this.ball.x = 640;
+                    this.ball.y = 450;
+                    for (var i = 0; i < 35; i++) {
+                        this.handRight.x -= 2;
+                        this.handLeft.x += 2;
+                        this.cutHandRight.x -= 2;
+                        this.cutHandLeft.x += 2;
+                        await sleep(5);
+                    }
                     this.scene.start("throw")
                 }
             } else {
@@ -183,7 +201,9 @@ const bootCatch = {
         }
         this.graphics.on('pointerdown', questionClear, this);
         
-        this.ball.y += 2;
+        if (this.notCaught) {
+            this.ball.y += 2;
+        }
         if (this.ball.y > 520) {
             this.ball.y = 150;
         }
@@ -199,10 +219,10 @@ const bootThrow = {
         this.load.image('ball', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/ball.png');
         this.load.image('net', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/net.png');
         this.load.image('bar', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/PowerMeter.png');
-        this.load.image('handRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
-        this.load.image('handLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
-        this.load.image('cutHandRight', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
-        this.load.image('cutHandLeft', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
+        this.load.image('hand', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/Hand.png');
+        this.load.image('cutHand', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandOverlay.png');
+        this.load.image('behindHand', 'https://raw.githubusercontent.com/marcles1234/BasketMadness/refs/heads/main/assets/HandBehind.png');
+        this.load.image
         var distance = Math.floor(Math.random() * 70) + 1;
         var height = Math.floor(Math.random() * 70) + 1;
         var power = Math.sqrt((distance * distance) + (height * height))
@@ -253,12 +273,12 @@ const bootThrow = {
         this.rectGraphics = rectGraphics;
         this.polyGraphics = polyGraphics;
 
-        this.handRight = this.add.image(720, 470, 'handRight');
-        this.handLeft = this.add.image(560, 470, 'handLeft');
+        this.handRight = this.add.image(720, 470, 'hand');
+        this.handLeft = this.add.image(560, 470, 'hand');
         this.handLeft.setFlipX(true);
         this.ball = this.add.image(640, 450, 'ball');
-        this.cutHandRight = this.add.image(724, 470, 'cutHandRight');
-        this.cutHandLeft = this.add.image(560, 470, 'cutHandLeft');
+        this.cutHandRight = this.add.image(720, 470, 'cutHand');
+        this.cutHandLeft = this.add.image(560, 470, 'cutHand');
         this.cutHandLeft.setFlipX(true);
         this.buttonNotClicked = true;
     },
@@ -274,6 +294,13 @@ const bootThrow = {
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
                     this.scene.pause("timer");
+                    this.handRight.destroy();
+                    this.handLeft.destroy();
+                    this.cutHandRight.destroy();
+                    this.cutHandLeft.destroy();
+                    this.backHandRight = this.add.image(720, 470, 'behindHand')
+                    this.backHandLeft = this.add.image(560, 470, 'behindHand')
+                    this.backHandLeft.setFlipX(true);
                     for (i = 0; i < 32; i++) {
                         var scale = 1 - (i / 50);
                         this.ball.setScale(scale);

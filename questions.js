@@ -63,11 +63,3 @@ fileInput.addEventListener("change", function(event) {
 
     reader.readAsText(file);
 });
-
-
-const button1 = document.getElementById("test-elements");
-button1.addEventListener("click", function() {
-    for (let i = 0; i < 20; i++) {
-        console.log("QandAs element ", i, " = ", QandAs[i]);
-    }
-});

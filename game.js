@@ -27,12 +27,12 @@ const bootTimer = {
         graphics.strokeRectShape(rect);
 
 
-        var text = this.add.text(1088, 32, 'Time: 60', {fontSize: '28px', fill: '#ffffff',});
+        var text = this.add.text(1088, 32, 'Time: 40', {fontSize: '28px', fill: '#ffffff',});
         this.scoreText = this.add.text(1088, 80, 'Score: ', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
         this.scoreText.setOrigin(0, 0);
 
-        var timeTrack = 60;
+        var timeTrack = 40;
 
         this.timer = this.time.addEvent({
             delay: 1000,
@@ -82,9 +82,12 @@ const bootQuestion = {
 
     create: function() {
         var graphics = this.add.graphics();
-        var rect = new Phaser.Geom.Rectangle(100, 100, 300, 440);
+        var rect = new Phaser.Geom.Rectangle(100, 100, 300, 152);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
+        graphics.fillRectShape(rect);
+        graphics.strokeRectShape(rect);
+        var rect = new Phaser.Geom.Rectangle(100, 352, 300, 152);
         graphics.fillRectShape(rect);
         graphics.strokeRectShape(rect);
         var button = new Phaser.Geom.Rectangle(780, 295, 255, 68);
@@ -92,16 +95,16 @@ const bootQuestion = {
         graphics.strokeRectShape(button);
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
-        var text = this.add.text(120, 120, 'Question Time!', {fontSize: '31px', fill: '#ffffff',});
+        var text = this.add.text(120, 120, 'Question:', {fontSize: '32px', fill: '#ffffff',});
         text.setOrigin(0, 0);
         var text = this.add.text(800, 315, 'Submit Answer', {fontSize: '28px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
-        var text = this.add.text(120, 300, 'What is ' + this.savedQandAs[this.questionNum] + '?', { font: '32px Courier', fill: '#ffffff',});
+        var text = this.add.text(120, 200, 'What is ' + this.savedQandAs[this.questionNum] + '?', { font: '32px Courier', fill: '#ffffff',});
         this.answer = this.savedQandAs[this.answerNum];
 
-        this.add.text(120, 350, 'Enter answer:', { font: '32px Courier', fill: '#ffffff' });
-        this.textAnswer = this.add.text(120, 400, '', { font: '32px Courier', fill: '#ffff00' });
+        this.add.text(120, 372, 'Enter answer:', { font: '32px Courier', fill: '#ffffff' });
+        this.textAnswer = this.add.text(120, 452, '', { font: '32px Courier', fill: '#ffffff' });
         this.input.keyboard.on('keydown', event =>
         {
             if (event.keyCode === 8 && this.textAnswer.text.length > 0)
@@ -289,8 +292,7 @@ const bootThrow = {
         }
 
         async function questionClear(pointer, gameObject){
-            //if (this.powerLevel < this.powerUpper && this.powerLevel > this.powerLower){
-            if (this.powerLevel < 50){
+            if (this.powerLevel < this.powerUpper && this.powerLevel > this.powerLower){
                 if (this.buttonNotClicked) {
                     this.buttonNotClicked = false;
                     this.scene.pause("timer");
@@ -345,16 +347,16 @@ const bootEnd = {
 
     create: function() {
         var graphics = this.add.graphics();
-        var button = new Phaser.Geom.Rectangle(500, 150, 400, 200);
+        var button = new Phaser.Geom.Rectangle(440, 205, 400, 200);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
         graphics.fillRectShape(button);
         graphics.strokeRectShape(button);
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
-        var text = this.add.text(520, 170, 'Congratulations! \nYou have won!', {fontSize: '31px', fill: '#ffffff',});
+        var text = this.add.text(460, 225, 'Congratulations! \n\nYou have won!', {fontSize: '31px', fill: '#ffffff',});
         text.setOrigin(0, 0);
-        var text = this.add.text(520, 246, 'Click this box to re-set', {fontSize: '24px', fill: '#ffffff',});
+        var text = this.add.text(460, 361, 'Click this box to re-set', {fontSize: '24px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
         this.graphics = graphics;
@@ -382,16 +384,16 @@ const bootFail = {
 
     create: function() {
         var graphics = this.add.graphics();
-        var button = new Phaser.Geom.Rectangle(500, 150, 400, 200);
+        var button = new Phaser.Geom.Rectangle(420, 205, 440, 200);
         graphics.fillStyle(0x929596, 1);
         graphics.lineStyle(2, 0x656666, 1)
         graphics.fillRectShape(button);
         graphics.strokeRectShape(button);
         graphics.setInteractive(new Phaser.Geom.Rectangle(button.x, button.y, button.width, button.height), Phaser.Geom.Rectangle.Contains);
 
-        var text = this.add.text(520, 170, 'Times up! \nBetter luck next time!', {fontSize: '31px', fill: '#ffffff',});
+        var text = this.add.text(440, 225, 'Times up! \n\nBetter luck next time!', {fontSize: '31px', fill: '#ffffff',});
         text.setOrigin(0, 0);
-        var text = this.add.text(520, 246, 'Click this box re-try.', {fontSize: '24px', fill: '#ffffff',});
+        var text = this.add.text(440, 361, 'Click this box re-try.', {fontSize: '24px', fill: '#ffffff',});
         text.setOrigin(0, 0);
 
         this.graphics = graphics;
